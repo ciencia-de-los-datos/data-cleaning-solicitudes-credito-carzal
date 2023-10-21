@@ -29,6 +29,7 @@ def clean_data():
     df.monto_del_credito = df["monto_del_credito"].apply(lambda x: x.replace("$"," ")).apply(lambda x: x.replace(" ",""))
     df.monto_del_credito = df.monto_del_credito.astype(float)
     df.línea_credito=df.línea_credito.str.replace('-',' ', regex=False).str.replace('_',' ', regex=False).str.capitalize().str.strip()
+    df= df.rename(columns={"línea_credito" : "linea_credito"})
     df.dropna(inplace=True)
     df.drop_duplicates(inplace=True)
     return df
