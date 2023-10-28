@@ -45,8 +45,18 @@ def clean_data():
     df.drop_duplicates(inplace=True)
     df.dropna(inplace=True)
     
+    
+    pregunta_uno = df.sexo.value_counts().to_list()
+    pregunta_dos = df.tipo_de_emprendimiento.value_counts().to_list()
+    pregunta_tres = df.idea_negocio.value_counts().to_list()
+    pregunta_cuatro = df.barrio.value_counts().to_list()
+    pregunta_cinco = df.estrato.value_counts().to_list()
+    pregunta_seis = df.comuna_ciudadano.value_counts().to_list()
+    pregunta_siete = df.fecha_de_beneficio.value_counts().to_list()
+    pregunta_ocho = df.monto_del_credito.value_counts().to_list()
+    pregunta_nueve = df.línea_credito.value_counts().to_list()
+    
     return df
 
 
-df.sexo.value_counts().to_list()
 
