@@ -7,9 +7,7 @@ correctamente. Tenga en cuenta datos faltantes y duplicados.
 
 """
 import pandas as pd
-from unidecode import unidecode
 import re
-
 
 def clean_data():
     def format_date(str_date):
@@ -24,24 +22,31 @@ def clean_data():
             date = day + '/' + month + '/' + year
             return date
 
-    df = pd.read_csv("solicitudes_credito.csv", sep=";")
-    df.drop_duplicates(inplace=True)
-    df.dropna(inplace=True)
-    df.rename(columns={'Unnamed: 0':'index'},inplace=True)
-    df.set_index('index',inplace=True)
-
-
-    df["sexo"] = df["sexo"].apply(lambda x : x.upper())
-    df["tipo_de_emprendimiento"] = df["tipo_de_emprendimiento"].apply(lambda x : str(x).upper()).apply(lambda x: str(x).replace(" ","")).apply(lambda x: unidecode(x)) 
-    df["idea_negocio"] = df["idea_negocio"].apply(lambda x : str(x).upper()).apply(lambda x: str(x).replace(" ","")).apply(lambda x: unidecode(x)).apply(lambda x: str(x).replace("-","")).apply(lambda x: str(x).replace("_","")).apply(lambda x: str(x).replace("-","")).apply(lambda x: str(x).replace(".",""))
-    #df["barrio"] = df["barrio"].apply(lambda x : str(x).upper()).apply(lambda x: str(x).replace(" ","")).apply(lambda x: unidecode(x)).apply(lambda x: str(x).replace("-","")).apply(lambda x: str(x).replace("_","")).apply(lambda x: str(x).replace("-","")).apply(lambda x: str(x).replace(".","")).apply(lambda x: str(x).replace("?","E"))
-    df.barrio = df.barrio.apply(lambda x : str(x).upper()).map(lambda x: re.sub("-| ", "_", str(x)))
-    df["línea_credito"] = df["línea_credito"].apply(lambda x : str(x).upper()).apply(lambda x: str(x).replace(" ","")).apply(lambda x: unidecode(x)).apply(lambda x: str(x).replace("-","")).apply(lambda x: str(x).replace("_","")).apply(lambda x: str(x).replace("-","")).apply(lambda x: str(x).replace(".",""))
-    #df["línea_credito"] = ["SOLIDARIA" if i == "SOLIDIARIA" else i for i in df["línea_credito"] ]
-    #df["fecha_de_beneficio"] = pd.to_datetime(df["fecha_de_beneficio"], format= "mixed")
-    df["monto_del_credito"] = df["monto_del_credito"].apply(lambda x: x.replace("$","")).apply(lambda x: x.replace(" ","")).apply(lambda x: x.replace(",","")).astype(float).astype(int)
-
+    df = pd.read_csv('solicitudes_credito.csv', sep=";")
+    df = df[df.columns[1:]]
     df.drop_duplicates(inplace=True)
     df.dropna(inplace=True)
 
+
+    for i in df.columns:
+        try:
+            df[i]= df[i].str.lower()
+        except:
+            pass
+    df.idea_negocio = df.idea_negocio.map(lambda x: re.sub("-|_", " ", str(x)))
+    df.idea_negocio = df.idea_negocio.str.strip()
+    df.monto_del_credito = df.monto_del_credito.map(lambda x: re.sub("\$|,", "", str(x)))
+    df["línea_credito"] = df["línea_credito"].map(lambda x: re.sub("-|_", " ", str(x)))
+    df["línea_credito"] = df["línea_credito"].str.strip()
+    df.barrio = df.barrio.map(lambda x: re.sub("-| ", "_", str(x)))
+    df.fecha_de_beneficio = df.fecha_de_beneficio.map(format_date)
+    df.monto_del_credito = df.monto_del_credito.map(lambda x : float(x))
+
+    df.drop_duplicates(inplace=True)
+    df.dropna(inplace=True)
+    
     return df
+
+
+df.sexo.value_counts().to_list()
+
